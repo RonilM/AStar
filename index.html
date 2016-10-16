@@ -63,7 +63,8 @@
 		var finPathStr;
 		random = new Random(_rows,_cols);
 
-		var heuristicFn = {
+		var heuristicNameArray = ['Diagonal','Euclidean','MaxCoordinate','Manhattan','EuclideanSquared'];
+		var heuristicFunction = {
 			'Euclidean' : function (x,y,goalx,goaly) {
 				var dX = Math.abs(x - goalx);
 				var dY = Math.abs(y - goaly);
@@ -176,7 +177,7 @@
 			for(var hrt in heuristicFn) {
 				for(var wv in weightVals) {
 					//avgrt, nodes_expanded, f, g, h, mem, avg.r pt. 
-					var heuristicFunction = heuristicFn[hrt];
+					//var heuristicFunction = heuristicFn[hrt];
 					var weight = weightVals[wv];
 					var partialObstacles = [];
 					var Obstacles = [];
@@ -221,7 +222,7 @@
 					console.log(start);
 					console.log(goal);
 					console.log(heuristicFunction);
-					var astar = new Astar(grid,start,goal,heuristicFunction,weight);
+					var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight);
 					finalPath = astar.getFinalPath();
 
 					finPathStr = "";
@@ -265,7 +266,7 @@
 				return;
 			}
 
-			var heuristicFunction = heuristicFn[document.getElementById('heuristic').value];
+			//var heuristicFunction = heuristicFn[document.getElementById('heuristic').value];
 			if(heuristicFunction == null) {
 				alert("Enter Correct Heuristic");
 				return;
@@ -321,15 +322,11 @@
 			}
 			//[[1,2],[3,3],[4,4]]
 			board = new Board('grid-div',_rows,_cols,partialObstacles,highways,PBhighways, blockedVar);
-			//board.init();
-			/*board.moveAgent('right');
-			board.moveAgent('down');
-			board.moveAgent('right');
-			board.moveAgent('right');*/
+			
 			var grid = board.getGrid();
 			console.log(start);
 			console.log(goal);
-			var astar = new Astar(grid,start,goal,heuristicFunction,weight);
+			var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight);
 			finalPath = astar.getFinalPath();
 			
 			//finalPath = astar.getFinalPath();

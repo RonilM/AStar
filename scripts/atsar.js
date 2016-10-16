@@ -1,11 +1,12 @@
 // Priority Queue
 	
-var Astar = function(grid, start, goal, generateHeuristicCostArg,hWeight) {
+var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 	//console.log(start);
 	//var grid = grid1;
 	var costMap = {};
 	var retResult = [];
-	var countNodes = 0;
+	var countNodes = new Array(hArr.length).fill(0);;
+	var hWeight2 = 1;
 	
 	init();
 	var path = search();
@@ -25,43 +26,145 @@ var Astar = function(grid, start, goal, generateHeuristicCostArg,hWeight) {
 
 
 	function init() {
-		
+		var totalHeuristics = hArr.length;
 		createCostMap();
 		for(var x in grid) {
 			for(var y in grid[x]) {
 				//console.log(grid[x][y]);
-				grid[x][y].f = 99999;
-				grid[x][y].g = 99999;
-				grid[x][y].isVisited = false;
-				grid[x][y].isInQueue = false;
-				grid[x][y].parent = null;
+				grid[x][y].h = [];
+				grid[x][y].f = [];
+				grid[x][y].g = new Array(totalHeuristics).fill(Number.MAX_VALUE);;
+				grid[x][y].isVisited = new Array(totalHeuristics).fill(false);
+				grid[x][y].isInQueue = new Array(totalHeuristics).fill(false);
+				grid[x][y].parent = [];
 			}	
 		}
 	}
 
-	
+	function expandStates(vertexS,i,pqArr) {
+		var neighbors = getNeighbors(grid, vertexS);
+		for(var j=0; j<neighbors.length;j++) {
+			var neighbor = neighbors[j];
+
+			if(neighbor.isVisited[i] == true || neighbor.Code == 0) {
+				continue;
+			}
+
+
+
+			if(neighbor.g[i] > vertexS.g[i] + getCost(vertexS, neighbor) ) {
+			
+				neighbor.g[i] = vertexS.g[i] + getCost(vertexS, neighbor);
+			
+				if(!neighbor.isInQueue[i]) {
+					neighbor.h[i] = generateHeuristicCost(neighbor.x,neighbor.y,goal.x,goal.y,i);
+					neighbor.f[i] = getPriorityInput(neighbor,i,goal.x,goal.y);
+					pqArr[i].enqueue(getPriorityInput(neighbor,i,goal.x,goal.y),neighbor);
+					neighbor.isInQueue[i] = true;
+				}
+				else {
+					pqArr[i].sort(neighbor);	
+				}
+				neighbor.parent[i] = vertexS;
+			}
+		}
+	}
 
 	function search() {
-		//console.log(grid);
 		var startTime = new Date().getTime();
-		console.log("GO!");
-		var priorityQ   = new PriorityQueue();
-		//var closedList = [];
-		grid[start.x][start.y].g = 0;
-		priorityQ.enqueue(grid[start.x][start.y].g+generateHeuristicCost(start.x,start.y,goal.x,goal.x),grid[start.x][start.y]);
-		grid[start.x][start.y].isInQueue = true;
 
-		while(priorityQ.isEmpty() != true) {
+		var totalHeuristics = hArr.length;
+		var pqArr = [];
+		grid[start.x][start.y].isInQueue = [];
+		grid[start.x][start.y].parent = [];
+		grid[start.x][start.y].g = new Array(totalHeuristics).fill(0);
+		grid[goal.x][goal.y].g = new Array(totalHeuristics).fill(Number.MAX_VALUE);
+		grid[goal.x][goal.y].parent = [];
+		for(var i = 0; i < totalHeuristics ; i++){
+			var priorityQ   = new PriorityQueue();
+			var node = grid[start.x][start.y];
+			grid[start.x][start.y].isInQueue[i] = true;
+			priorityQ.enqueue(getPriorityInput(node,i,goal.x,goal.y),node);
+			pqArr.push(priorityQ);
+		}
+		//Number.MAX_VALUE;
+		var startNode = grid[start.x][start.y];
+		var goalNode = grid[goal.x][goal.y];
+		//var closedList = [];
+		
+		
+		console.log(pqArr[0].peek());
+		while(pqArr[0].peek() < Number.MAX_VALUE) {
+			//console.log("98");//**
+			for(var i = 1; i < totalHeuristics ; i++) {
+
+				if(pqArr[i].peek() <= hWeight2*pqArr[0].peek()) {
+					if(goalNode.g[i] <= pqArr[i].peek()) { 
+						//console.log("102");
+						if(goalNode.g[i] < Number.MAX_VALUE) {
+							return terminateAndReturn(i);
+						}
+					}
+					else {
+						//console.log("107");
+						if(!pqArr[i].isEmpty()) {
+							var vertexS = pqArr[i].dequeue();
+							vertexS.isVisited[i] = true;
+							vertexS.isInQueue[i] = false;
+							countNodes[i]++;
+							expandStates(vertexS,i,pqArr);
+						}
+					}
+				}
+				else {
+					//console.log("117");//**
+					if(goalNode.g[0] <= pqArr[0].peek()) {
+						if(goalNode.g[0] < Number.MAX_VALUE) {
+							return terminateAndReturn(0);
+						}
+					}
+					else {
+						//console.log("123");
+						if(!pqArr[0].isEmpty()) {
+							var vertexS = pqArr[0].dequeue();
+							vertexS.isVisited[0] = true;
+							vertexS.isInQueue[0] = false;
+							countNodes[0]++;
+							expandStates(vertexS,0,pqArr);
+						}
+					}
+					
+				}
+
+			}
+
+			function terminateAndReturn(i) {
+				var ret = [];
+				var curr = goalNode;
+				while(curr) {
+					ret.push(curr);
+					curr = curr.parent[i];
+				}
+				var endTime = new Date().getTime();
+				var timeElapsed = endTime - startTime;
+
+				retResult[0] = ret.reverse();
+				retResult[1] = timeElapsed;
+				console.log(countNodes[i]);
+				console.log(ret);
+				return retResult;
+			}
+
 			//console.log("In while!");
-			var vertexS = priorityQ.dequeue();
-			countNodes++;
+			//var vertexS = priorityQ.dequeue();
+			//countNodes++;
 
 			//console.log(vertexS);
-			vertexS.isVisited = true; 
-			vertexS.isInQueue = false;
+			//vertexS.isVisited = true; 
+			//vertexS.isInQueue = false;
 			//console.log(vertexS);
 	
-			if(vertexS.x == goal.x && vertexS.y == goal.y) {
+			/*if(vertexS.x == goal.x && vertexS.y == goal.y) {
 				//console.log("!!!!!!!!!");
 				var curr = vertexS;
 				var ret = [];
@@ -78,16 +181,16 @@ var Astar = function(grid, start, goal, generateHeuristicCostArg,hWeight) {
 				console.log(countNodes);
 				return retResult;
 			}
-
+			*/
 
 			// var indexPQ = priorityQ.indexOf(vertexS);
 			// priorityQ.splice(indexPQ,1);
 			//priorityQ.remove(vertexS);
 			//closedList.push(vertexS);
-			var neighbors = getNeighbors(grid, vertexS);
+			//var neighbors = getNeighbors(grid, vertexS);
 
 
-			for(var i=0; i<neighbors.length;i++) {
+			/*for(var i=0; i<neighbors.length;i++) {
 					var neighbor = neighbors[i];
 					//var isValid = nodeObstacle(neighbor);
 					//var x = neighbor.x;
@@ -118,12 +221,13 @@ var Astar = function(grid, start, goal, generateHeuristicCostArg,hWeight) {
 					
 					
 					
-			}
+			}*/
 		}
 		var endTime = new Date().getTime();
 		var timeElapsed = endTime - startTime;
 		retResult[0] = [];
 		retResult[1] = timeElapsed;
+		console.log("NO!");
 		return retResult;
 	}
 
@@ -305,25 +409,22 @@ var Astar = function(grid, start, goal, generateHeuristicCostArg,hWeight) {
 		return Math.sqrt( (sx-ex)*(sx-ex) + (sy-ey)*(sy-ey) );
 	}
 
-	function generateHeuristicCost(x,y,goalx,goaly) {
+	function generateHeuristicCost(x,y,goalx,goaly,heuristicIndex) {
 		x = parseInt(x);
 		y = parseInt(y);
 		goalx = parseInt(goalx);
 		goaly = parseInt(goaly);
 
-		return hWeight*generateHeuristicCostArg(x,y,goalx,goaly);
+		var heuristicFn = heuristicFunctions[hArr[heuristicIndex]];
+
+		return heuristicFn(x,y,goalx,goaly);
 
 	}
 
-	// function nodeObstacle(adjacentNode) {
-	// 	return neighbor.isObstacle;
+	function getPriorityInput(node,i,goalx,goaly) {
+		return node.g[i] + hWeight1*generateHeuristicCost(node.x,node.y,goalx,goaly,i);
+	}
 
-
-	// 	// if(grid[x][y].isObstacle) {
-	// 	// 	return 1;
-	// 	// }
-	// 	// return 0;
-	// }
 
 	
 

@@ -48,17 +48,25 @@ PriorityQueue.prototype = {
     return result.key;
   },
 
-  sort: function(node) {
+  peek: function() {
+    var result = this.content[0];
+    return result != null?result.priority:null;
 
-    var n = 0;
-    for(var k in content) {
-      if(content[k].key.x == node.x && content[k].key.y == node.y) {
+  },
+
+  sort: function(node) {
+    var n = -1;
+    for(var k in this.content) {
+      if(this.content[k].key.x == node.x && this.content[k].key.y == node.y) {
         n = k;
       }
     }
-
-    this.bubbleUp(n);
-    this.sinkDown(n);
+    if(n == -1) {
+      return;
+    }
+    var num = parseInt(n);
+    this.bubbleUp(num);
+    this.sinkDown(num);
   },
 
   remove: function(node) {
@@ -106,6 +114,14 @@ PriorityQueue.prototype = {
       parent = this.content[parentN];
       // If the parent has a lesser score, things are in order and we
       // are done.
+      
+      if(parent == null) {
+        var str = "[";
+        for(var x in this.content) {
+          str += (this.content[x]?this.content[x].priority:"--") +",\n";
+        }
+        console.log(str);
+      }
       if (score >= this.scoreFunction(parent))
         break;
 
