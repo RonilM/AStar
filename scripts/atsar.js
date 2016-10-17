@@ -1,13 +1,14 @@
 // Priority Queue
 	
-var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
+var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1,hWeight2) {
 	//console.log(start);
 	//var grid = grid1;
 	var costMap = {};
 	var retResult = [];
 	var countNodes = new Array(hArr.length).fill(0);;
-	var hWeight2 = 1;
-	
+	//var hWeight2 = 1;
+	var lengthPQ = 0;
+
 	init();
 	var path = search();
 	
@@ -24,6 +25,9 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 		return countNodes;
 	}
 
+	Astar.prototype.getLength = function() {
+		return lengthPQ;
+	}
 
 	function init() {
 		var totalHeuristics = hArr.length;
@@ -94,7 +98,7 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 
 	function search() {
 		var startTime = new Date().getTime();
-
+		
 		var totalHeuristics = hArr.length;
 		var pqArr = [];
 		grid[start.x][start.y].isInQueue = [];
@@ -113,8 +117,15 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 			node.h[i] = generateHeuristicCost(start.x,start.y,goal.x,goal.y,i);
 			node.isInQueue[i] = true;
 			priorityQ.enqueue(getPriorityInput(node,i,goal.x,goal.y),node);
+
+			//lengthPQ += priorityQ.length();
+			
+
 			pqArr.push(priorityQ);
 		}
+
+
+		//console.log(lengthPQ);
 		//Number.MAX_VALUE;
 		var startNode = grid[start.x][start.y];
 		var goalNode = grid[goal.x][goal.y];
@@ -178,8 +189,15 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 
 				retResult[0] = ret.reverse();
 				retResult[1] = timeElapsed;
-				console.log(countNodes[i]);
+				console.log(countNodes[1]);
 				console.log(ret);
+
+				for (var i = 0; i < totalHeuristics; i++) {
+					lengthPQ += pqArr[i].size();
+				}
+
+				console.log("length" + lengthPQ);
+
 				return retResult;
 			}
 

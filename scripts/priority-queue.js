@@ -128,6 +128,8 @@ PriorityQueue.prototype = {
     }
   },
 
+  
+
   sinkDown: function(n) {
     // Look up the target element and its score.
     var length = this.content.length,

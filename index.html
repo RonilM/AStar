@@ -28,9 +28,12 @@
 			<button onclick="generateEndpoints();">Generate Endpoints</button>
 		</div>
 		<br/>
-		<div style=""> <label> Heuristic:</label>  <input id="heuristic" type="text">	<p style="color:#607d8b">Euclidean,MaxCoordinate,Manhattan,Diagonal,EuclideanSquared</p></div>
+		<!-- <div style=""> <label> Heuristic:</label>  <input id="heuristic" type="text">	<p style="color:#607d8b">Euclidean,MaxCoordinate,Manhattan,Diagonal,EuclideanSquared</p></div> -->
 		<br/>
-		<div style=""> <label> Weight:</label>  <input id="weight" type="text"></div>
+		<div style=""> <label> Weight1:</label>  <input id="weight" type="text"></div>
+		<br/>
+		<br/>
+		<div style=""> <label> Weight2:</label>  <input id="weight2" type="text"></div>
 		<br/>
 		<label>Upload Input Map:</label><input onchange="uploadInputMap();" type="file" id="fileinput" />
 		<button onclick="runAlgo();">Run Algorithm</button>
@@ -173,12 +176,14 @@
 			console.log("Start: ("+start.x+","+start.y+")");
 			console.log("Goal: ("+goal.x+","+goal.y+")");
 			console.log("\n");
-			var weightVals = [0,1.0,1.25,2.0]
-			for(var hrt in heuristicFn) {
-				for(var wv in weightVals) {
+			var weightVals = [1.25,2.0];
+
+			for(var wv in weightVals) {
+				for(var wv2 in weightVals) {
 					//avgrt, nodes_expanded, f, g, h, mem, avg.r pt. 
 					//var heuristicFunction = heuristicFn[hrt];
 					var weight = weightVals[wv];
+					var weight2 = weightVals[wv2];
 					var partialObstacles = [];
 					var Obstacles = [];
 					var highways = {};
@@ -222,8 +227,10 @@
 					console.log(start);
 					console.log(goal);
 					console.log(heuristicFunction);
-					var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight);
+					var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
 					finalPath = astar.getFinalPath();
+					var memory = astar.getLength();
+					var nodes = astar.getCountNodes();
 
 					finPathStr = "";
 					var finIdx;
@@ -233,7 +240,11 @@
 					}
 					finPathStr = finalPath[0][finIdx].g+"\n"+finPathStr;
 					
-					tuple += hrt+", W="+weight+",FP="+finalPath[0].length+","+finalPath[1]+","+astar.getCountNodes()+","+finalPath[0][finIdx].f+","+finalPath[0][finIdx].g+","+finalPath[0][finIdx].h+"\n";
+
+					tuple += ", W1="+weight+", W2="+weight2+",FP="+finalPath[0].length+","+finalPath[1]+","+nodes[0]+","+finalPath[0][finIdx].g+","+memory+"\n";
+
+					// tuple += ", W="+weight+",FP="+finalPath[0].length+","+finalPath[1]+","+astar.getCountNodes()+","+finalPath[0][finIdx].f+","+finalPath[0][finIdx].g+","+finalPath[0][finIdx].h+"\n";
+
 
 					ele = document.getElementById("map-svg");
 					if(ele != null){
@@ -277,7 +288,15 @@
 				alert("Enter Correct Weight");
 				return;
 			}
+
+			var weightStr2 = document.getElementById('weight2').value;
+			if(weightStr == '' || weightStr == null) {
+				alert("Enter Correct Weight2");
+				return;
+			}
+
 			var weight = parseFloat(weightStr);
+			var weight2 = parseFloat(weightStr2);
 
 			//random = new Random(_rows,_cols);
 			//start = random.getStartPoint();
@@ -326,9 +345,9 @@
 			var grid = board.getGrid();
 			console.log(start);
 			console.log(goal);
-			var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight);
+			var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
 			finalPath = astar.getFinalPath();
-			
+			var memory = astar.getLength();
 			//finalPath = astar.getFinalPath();
 			console.log(finalPath);
 			finPathStr = "";
