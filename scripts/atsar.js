@@ -30,7 +30,7 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 		createCostMap();
 		for(var x in grid) {
 			for(var y in grid[x]) {
-				//console.log(grid[x][y]);
+				
 				grid[x][y].h = [];
 				grid[x][y].f = [];
 				grid[x][y].g = Number.MAX_VALUE;
