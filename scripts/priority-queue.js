@@ -1,29 +1,31 @@
 /*var  PriorityQueue =function () {
-  		this._nodes = [];
+      this._nodes = [];
 
-  		this.enqueue = function (priority, key) {
-    		this._nodes.push({key: key, priority: priority });
-    		this.sort();
-  	}
-  		this.dequeue = function () {
-    		return this._nodes.shift().key;
-  		}
-  		this.sort = function () {
-    		this._nodes.sort(function (a, b) {
-      			return (a.priority - b.priority);
-    		});
-  		}
-  		this.isEmpty = function () {
-    		return !this._nodes.length;
-  		}
+      this.enqueue = function (priority, key) {
+        this._nodes.push({key: key, priority: priority });
+        this.sort();
+    }
+      this.dequeue = function () {
+        return this._nodes.shift().key;
+      }
+      this.sort = function () {
+        this._nodes.sort(function (a, b) {
+            return (a.priority - b.priority);
+        });
+      }
+      this.isEmpty = function () {
+        return !this._nodes.length;
+      }
 }*/
 
 
-function PriorityQueue(){
+function PriorityQueue(i,ScoreFunction){
   this.content = [];
-  this.scoreFunction = function(element) {
+  this.scoreFunction = ScoreFunction;
+  this.i = i;
+  /*function(element) {
     return element.priority; 
-  };
+  };*/
 }
 
 PriorityQueue.prototype = {
@@ -50,7 +52,7 @@ PriorityQueue.prototype = {
 
   peek: function() {
     var result = this.content[0];
-    return result != null?result.priority:null;
+    return result != null?this.scoreFunction(result,this.i):null;
 
   },
 
@@ -106,7 +108,7 @@ PriorityQueue.prototype = {
 
   bubbleUp: function(n) {
     // Fetch the element that has to be moved.
-    var element = this.content[n], score = this.scoreFunction(element);
+    var element = this.content[n], score = this.scoreFunction(element,this.i);
     // When at 0, an element can not go up any further.
     while (n > 0) {
       // Compute the parent element's index, and fetch it.
@@ -115,14 +117,7 @@ PriorityQueue.prototype = {
       // If the parent has a lesser score, things are in order and we
       // are done.
       
-      if(parent == null) {
-        var str = "[";
-        for(var x in this.content) {
-          str += (this.content[x]?this.content[x].priority:"--") +",\n";
-        }
-        console.log(str);
-      }
-      if (score >= this.scoreFunction(parent))
+      if (score >= this.scoreFunction(parent,this.i))
         break;
 
       // Otherwise, swap the parent with the current element and
@@ -137,7 +132,7 @@ PriorityQueue.prototype = {
     // Look up the target element and its score.
     var length = this.content.length,
     element = this.content[n],
-    elemScore = this.scoreFunction(element);
+    elemScore = this.scoreFunction(element,this.i);
 
     while(true) {
       // Compute the indices of the child elements.
@@ -149,7 +144,7 @@ PriorityQueue.prototype = {
       if (child1N < length) {
         // Look it up and compute its score.
         var child1 = this.content[child1N],
-        child1Score = this.scoreFunction(child1);
+        child1Score = this.scoreFunction(child1,this.i);
         // If the score is less than our element's, we need to swap.
         if (child1Score < elemScore)
           swap = child1N;
@@ -157,7 +152,7 @@ PriorityQueue.prototype = {
       // Do the same checks for the other child.
       if (child2N < length) {
         var child2 = this.content[child2N],
-        child2Score = this.scoreFunction(child2);
+        child2Score = this.scoreFunction(child2,this.i);
         if (child2Score < (swap == null ? elemScore : child1Score))
           swap = child2N;
       }

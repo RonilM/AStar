@@ -81,8 +81,9 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 		grid[goal.x][goal.y].g = new Array(totalHeuristics).fill(Number.MAX_VALUE);
 		grid[goal.x][goal.y].parent = [];
 		for(var i = 0; i < totalHeuristics ; i++){
-			var priorityQ   = new PriorityQueue();
+			var priorityQ   = new PriorityQueue(i,function(el,j) { return (el.key.g[j] + hWeight1*el.key.h[j]) });
 			var node = grid[start.x][start.y];
+			node.h[i] = generateHeuristicCost(start.x,start.y,goal.x,goal.y,i);
 			grid[start.x][start.y].isInQueue[i] = true;
 			priorityQ.enqueue(getPriorityInput(node,i,goal.x,goal.y),node);
 			pqArr.push(priorityQ);
@@ -93,7 +94,7 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 		//var closedList = [];
 		
 		
-		console.log(pqArr[0].peek());
+		console.log(pqArr[0]);
 		while(pqArr[0].peek() < Number.MAX_VALUE) {
 			//console.log("98");//**
 			for(var i = 1; i < totalHeuristics ; i++) {
