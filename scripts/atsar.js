@@ -102,7 +102,8 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1,hWeigh
 		while(pqArr[0].peek() < Number.MAX_VALUE) {
 			//console.log("98");//**
 			for(var i = 1; i < totalHeuristics ; i++) {
-
+				//console.log("1.>>> "+pqArr[i].peek());
+				//console.log("2.>>> "+hWeight2*pqArr[0].peek());
 				if(pqArr[i].peek() <= hWeight2*pqArr[0].peek()) {
 					if(goalNode.g[i] <= pqArr[i].peek()) { 
 						//console.log("102");
