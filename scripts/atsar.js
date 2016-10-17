@@ -1,12 +1,13 @@
 // Priority Queue
 	
-var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
+var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1,hWeight2) {
 	//console.log(start);
 	//var grid = grid1;
 	var costMap = {};
 	var retResult = [];
 	var countNodes = new Array(hArr.length).fill(0);;
-	var hWeight2 = 1;
+	//var hWeight2 = 1;
+	var lengthPQ = 0;
 	
 	init();
 	var path = search();
@@ -24,6 +25,9 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 		return countNodes;
 	}
 
+	Astar.prototype.getLength = function() {
+ 		return lengthPQ;
+ 	}
 
 	function init() {
 		var totalHeuristics = hArr.length;
@@ -153,6 +157,12 @@ var Astar = function(grid, start, goal, heuristicFunctions, hArr,hWeight1) {
 				retResult[1] = timeElapsed;
 				console.log(countNodes[i]);
 				console.log(ret);
+
+				for (var i = 0; i < totalHeuristics; i++) {
+ 					lengthPQ += pqArr[i].size();
+ 				}
+ 
+ 				console.log("length" + lengthPQ);
 				return retResult;
 			}
 
